@@ -1,4 +1,5 @@
 import argparse
+import json
 
 
 def main():
@@ -15,3 +16,12 @@ def main():
         help='set format of output'
     )
     args = parser.parse_args()
+    data1 = read_file(args.first_file)
+    data2 = read_file(args.second_file)
+    print(data1)
+    print(data2)
+
+
+def read_file(filepath):
+    with open(filepath, 'r', encoding='utf-8') as f:
+        return json.load(f)
