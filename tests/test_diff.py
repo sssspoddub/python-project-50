@@ -1,0 +1,15 @@
+from gendiff import generate_diff
+import os
+
+
+def test_generate_diff():
+    base_path = os.path.join(os.path.dirname(__file__), 'test_data')
+    file1 = os.path.join(base_path, 'file1.json')
+    file2 = os.path.join(base_path, 'file2.json')
+    expected_path = os.path.join(base_path, 'expected_diff.txt')
+
+    with open(expected_path) as f:
+        expected = f.read()
+
+    diff = generate_diff(file1, file2)
+    assert diff == expected
