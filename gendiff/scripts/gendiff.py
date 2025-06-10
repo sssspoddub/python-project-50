@@ -16,3 +16,4 @@ def main():
 
     result = generate_diff(args.first_file, args.second_file)
     print(result)
+
