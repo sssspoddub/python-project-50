@@ -1,4 +1,5 @@
 import json
+
 from .diff import build_diff_dict
 
 
