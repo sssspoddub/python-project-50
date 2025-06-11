@@ -3,6 +3,8 @@ from pathlib import Path
 
 import yaml
 
+from gendiff.formatters.stylish import stylish
+
 
 def load_file(filepath):
     filepath = Path(filepath)
@@ -24,27 +26,29 @@ def build_diff(filepath1, filepath2):
         result = []
         for key in keys:
             if key not in d1:
-                result.append(
-                    {'key': key, 'status': 'added', 'value': d2[key]})
+                result.append({'key': key, 'status': 'added', 'value': d2[key]})
             elif key not in d2:
                 result.append(
-                    {'key': key, 'status': 'removed', 'value': d1[key]})
+                    {'key': key, 'status': 'removed', 'value': d1[key]}
+                )
             else:
                 val1 = d1[key]
                 val2 = d2[key]
                 if isinstance(val1, dict) and isinstance(val2, dict):
                     children = diff_dict(val1, val2)
                     result.append(
-                        {'key': key, 'status': 'nested', 'children': children})
+                        {'key': key, 'status': 'nested', 'children': children}
+                    )
                 elif val1 == val2:
                     result.append(
-                        {'key': key, 'status': 'unchanged', 'value': val1})
+                        {'key': key, 'status': 'unchanged', 'value': val1}
+                    )
                 else:
                     result.append({
                         'key': key,
                         'status': 'changed',
                         'old_value': val1,
-                        'new_value': val2,
+                        'new_value': val2
                     })
         return result
 
@@ -53,4 +57,6 @@ def build_diff(filepath1, filepath2):
 
 def generate_diff(filepath1, filepath2, format_name='stylish'):
     diff = build_diff(filepath1, filepath2)
-    return diff
+    if format_name == 'stylish':
+        return stylish(diff)
+    return stylish(diff)
