@@ -40,9 +40,17 @@ def build_diff(filepath1, filepath2):
                     result.append(
                         {'key': key, 'status': 'unchanged', 'value': val1})
                 else:
-                    result.append(
-                        {'key': key, 'status': 'changed', 'old_value': val1,
-                            'new_value': val2})
+                    result.append({
+                        'key': key,
+                        'status': 'changed',
+                        'old_value': val1,
+                        'new_value': val2,
+                    })
         return result
 
     return diff_dict(data1, data2)
+
+
+def generate_diff(filepath1, filepath2, format_name='stylish'):
+    diff = build_diff(filepath1, filepath2)
+    return diff
