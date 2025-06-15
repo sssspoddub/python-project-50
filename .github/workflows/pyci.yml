@@ -5,31 +5,22 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
 
-      - name: Install dependencies
+      - name: Install project + dev-deps
         run: |
           pip install uv
           uv pip install -e ".[dev]"
 
-      - name: Run Linter and pytest
-        run: make check
+      - name: Lint + pytest
+        run: make check          # «check» → ruff + pytest
 
-      - name: Run test coverage
-        run: make test-coverage     # создает coverage.xml
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2   # оф. action :contentReference[oaicite:1]{index=1}
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.projectKey=sssspoddub_python-project-50
-            -Dsonar.organization=sssspoddub
-            -Dsonar.python.coverage.reportPaths=coverage.xml
+      # генерируем coverage.xml, чтобы Sonar мог его забрать при нужде
+      - name: Coverage
+        run: make test-coverage
