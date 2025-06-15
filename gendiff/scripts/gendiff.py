@@ -5,6 +5,8 @@ import argparse
 import sys
 from pathlib import Path
 
+from gendiff import generate_diff
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -23,9 +25,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> None:
-    build_parser().parse_args(argv)
-    sys.stdout.write("Feature not implemented yet\n")
+    args = build_parser().parse_args(argv)
+    diff = generate_diff(args.first_file, args.second_file)
+    sys.stdout.write(diff + "\n")
 
 
-if __name__ == "__main__":  # запуск через: python -m gendiff.scripts.gendiff
+if __name__ == "__main__":
     main()

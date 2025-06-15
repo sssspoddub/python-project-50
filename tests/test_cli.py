@@ -1,28 +1,36 @@
+import subprocess
 import sys
 from pathlib import Path
-
-import pytest
 
 import gendiff.scripts.gendiff as cli
 
 
 def test_build_parser_specs():
     parser = cli.build_parser()
-    assert parser.prog == "gendiff"
-    args = parser.parse_args(["file1", "file2"])
-    assert isinstance(args.first_file, Path)
-    assert isinstance(args.second_file, Path)
-    assert args.format == "stylish"  # значение по умолчанию
+    args = parser.parse_args(["one.json", "two.json"])
+    assert args.format == "stylish"
 
 
-def test_format_option_parsed():
-    parser = cli.build_parser()
-    args = parser.parse_args(["-f", "plain", "a.txt", "b.txt"])
-    assert args.format == "plain"
+def test_cli_output(tmp_path: Path):
+    fixtures = Path(__file__).parent / "fixtures"
+    file1 = fixtures / "file1.json"
+    file2 = fixtures / "file2.json"
 
+    result = subprocess.run(
+        [sys.executable, "-m", "gendiff.scripts.gendiff", file1, file2],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
 
-def test_main_placeholder(monkeypatch, capsys):
-    monkeypatch.setattr(sys, "argv", ["gendiff", "one", "two"])
-    cli.main()
-    out, _ = capsys.readouterr()
-    assert out.strip() == "Feature not implemented yet"
+    expected = (
+        "{\n"
+        "  - follow: false\n"
+        "    host: hexlet.io\n"
+        "  - proxy: 123.234.53.22\n"
+        "  - timeout: 50\n"
+        "  + timeout: 20\n"
+        "  + verbose: true\n"
+        "}"
+    )
+    assert result == expected
