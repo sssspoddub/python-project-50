@@ -1,42 +1,44 @@
-"""Diff generator for flat JSON files."""
-
-from __future__ import annotations
-
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Mapping
 
-from .readers import read_file
-
-
-def _stringify(value: Any) -> str:
-    """Convert Python value to CLI-friendly representation."""
-    if isinstance(value, bool):            # true/false в нижнем регистре
-        return str(value).lower()
-    if value is None:
-        return "null"
-    return str(value)
+from gendiff.readers import read_file
 
 
-def _build_ast(data1: Mapping[str, Any], data2: Mapping[str, Any]) -> list[str]:
-    """Return list of diff lines with proper prefixes."""
-    lines: list[str] = []
-    for key in sorted(set(data1) | set(data2)):
-        if key in data1 and key in data2:
-            if data1[key] == data2[key]:
-                lines.append(f"    {key}: {_stringify(data1[key])}")
-            else:
-                lines.append(f"  - {key}: {_stringify(data1[key])}")
-                lines.append(f"  + {key}: {_stringify(data2[key])}")
-        elif key in data1:
-            lines.append(f"  - {key}: {_stringify(data1[key])}")
-        else:  # key only in data2
-            lines.append(f"  + {key}: {_stringify(data2[key])}")
-    return lines
+def _ensure_mapping(src: str | Path | Mapping) -> dict:
+    if isinstance(src, Mapping):
+        return dict(src)
+    return read_file(src)
 
 
-def generate_diff(path1: str | Path, path2: str | Path) -> str:
-    """Generate diff string between two flat-JSON files."""
-    data1 = read_file(path1)
-    data2 = read_file(path2)
-    body = "\n".join(_build_ast(data1, data2))
-    return "{\n" + body + "\n}"
+def _stringify(val) -> str:
+    return str(val)
+
+
+def generate_diff(
+    file1: str | Path | Mapping,
+    file2: str | Path | Mapping,
+    *,
+    fmt: str = "stylish",
+) -> str:
+    if fmt != "stylish":
+        raise ValueError(f"unknown format: {fmt}")
+
+    d1, d2 = map(_ensure_mapping, (file1, file2))
+
+    lines: list[str] = ["{"]
+
+    for key in sorted(d1.keys() | d2.keys()):
+        in1, in2 = key in d1, key in d2
+
+        if in1 and not in2:  # removed
+            lines.append(f"  - {key}: {_stringify(d1[key])}")
+        elif not in1 and in2:  # added
+            lines.append(f"  + {key}: {_stringify(d2[key])}")
+        elif d1[key] == d2[key]:  # unchanged
+            lines.append(f"    {key}: {_stringify(d1[key])}")
+        else:  # changed
+            lines.append(f"  - {key}: {_stringify(d1[key])}")
+            lines.append(f"  + {key}: {_stringify(d2[key])}")
+
+    lines.append("}")
+    return "\n".join(lines)

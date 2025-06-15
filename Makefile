@@ -7,6 +7,6 @@ test:
 	uv run pytest -q
 
 test-coverage:
-	uv run pytest --cov=gendiff --cov-report=xml
+	uv run pytest --cov=gendiff --cov-report=xml --cov-fail-under=80
 
 check: lint test
