@@ -3,24 +3,30 @@ name: Python CI
 on: [push, pull_request]
 
 jobs:
-  build:
+  checks:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
+      # готовая утилита от Astral — ставит uv во /usr/local/bin
+      - uses: astral-sh/setup-uv@v6
 
-      - name: Install project + dev-deps
+      # ─── виртуальная среда + зависимости ─────────────────────
+      - name: Create venv and install dev-deps
         run: |
-          pip install uv
+          uv venv .venv
+          source .venv/bin/activate
           uv pip install -e ".[dev]"
 
-      - name: Lint + pytest
-        run: make check          # «check» → ruff + pytest
+      # ─── линтер + pytest ─────────────────────────────────────
+      - name: Lint & tests
+        run: |
+          source .venv/bin/activate
+          make check
 
-      # генерируем coverage.xml, чтобы Sonar мог его забрать при нужде
+      # ─── отчёт покрытия (xml) ───────────────────────────────
       - name: Coverage
-        run: make test-coverage
+        run: |
+          source .venv/bin/activate
+          make test-coverage
