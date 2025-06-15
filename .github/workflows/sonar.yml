@@ -1,5 +1,4 @@
 name: sonar
-
 on:
   push:
     branches: [main]
@@ -7,10 +6,9 @@ on:
 jobs:
   sonarcloud:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6          # тот же шаг установки uv
+      - uses: astral-sh/setup-uv@v6
 
       - name: Create venv & install dev-deps
         run: |
@@ -18,13 +16,13 @@ jobs:
           source .venv/bin/activate
           uv pip install -e ".[dev]"
 
-      - name: Run tests (create coverage.xml)
+      - name: Tests (produce coverage.xml)
         run: |
           source .venv/bin/activate
           uv run pytest --cov=gendiff --cov-report=xml
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
+        uses: SonarSource/sonarqube-scan-action@v5     # актуальный релиз
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
