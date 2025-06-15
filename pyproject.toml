@@ -1,9 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "hexlet-code"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
-[tool.uvicorn.scripts]
+description = "CLI-utility that compares two configuration files and shows a difference."
+authors = [{name = "Your Name", email = "you@example.com"}]
+requires-python = ">=3.9"
+
+[project.scripts]
 gendiff = "gendiff.scripts.gendiff:main"
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=4"
+]
