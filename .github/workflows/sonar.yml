@@ -7,20 +7,25 @@ on:
 jobs:
   sonarcloud:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
 
-      - name: Install deps + run tests (coverage)
+      - name: Install dev-dependencies
         run: |
-          pip install uv
-          uv pip install -e ".[dev]"
-          make test-coverage          # создаёт coverage.xml
+          python -m pip install --upgrade pip
+          python -m pip install ".[dev]"
 
-      - name: SonarCloud scan
-        uses: SonarSource/sonarcloud-github-action@v2   # ← исправлено
+      - name: Run tests & generate coverage.xml
+        run: |
+          python -m pytest --cov=gendiff --cov-report=xml
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2   # правильный owner + repo
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
