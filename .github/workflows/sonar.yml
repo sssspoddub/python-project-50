@@ -1,0 +1,31 @@
+name: sonar
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dev-deps & run tests
+        run: |
+          pip install uv
+          uv pip install -e ".[dev]"              # содержит pytest-cov + ruff
+          make coverage                           # создаёт coverage.xml
+
+      - name: SonarCloud scan
+        uses: SonarSource/sonarcloud-github-action@v2          :contentReference[oaicite:1]{index=1}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}             # добавить в Settings → Secrets → Actions
+        with:
+          args: >
+            -Dsonar.projectKey=sssspoddub_python-project-50
+            -Dsonar.organization=sssspoddub
+            -Dsonar.python.coverage.reportPaths=coverage.xml  # ключ из оф.доков :contentReference[oaicite:2]{index=2}
