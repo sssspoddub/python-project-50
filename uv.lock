@@ -106,6 +106,9 @@ wheels = [
 name = "hexlet-code"
 version = "0.1.0"
 source = { editable = "." }
+dependencies = [
+    { name = "pyyaml" },
+]
 
 [package.optional-dependencies]
 dev = [
@@ -113,18 +116,15 @@ dev = [
     { name = "pytest-cov" },
     { name = "ruff" },
 ]
-yaml = [
-    { name = "pyyaml" },
-]
 
 [package.metadata]
 requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4" },
-    { name = "pyyaml", marker = "extra == 'yaml'", specifier = ">=6" },
+    { name = "pyyaml", specifier = ">=6" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4" },
 ]
-provides-extras = ["dev", "yaml"]
+provides-extras = ["dev"]
 
 [[package]]
 name = "iniconfig"
