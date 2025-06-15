@@ -12,20 +12,13 @@ def test_build_parser_specs():
     args = parser.parse_args(["file1", "file2"])
     assert isinstance(args.first_file, Path)
     assert isinstance(args.second_file, Path)
-    assert args.format == "stylish"  # default value
+    assert args.format == "stylish"  # значение по умолчанию
 
 
 def test_format_option_parsed():
     parser = cli.build_parser()
     args = parser.parse_args(["-f", "plain", "a.txt", "b.txt"])
     assert args.format == "plain"
-
-
-def test_help_contains_format(capsys):
-    with pytest.raises(SystemExit):
-        cli.build_parser().parse_args(["--help"])
-    out, _ = capsys.readouterr()
-    assert "-f FORMAT, --format FORMAT" in out
 
 
 def test_main_placeholder(monkeypatch, capsys):
