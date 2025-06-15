@@ -2,6 +2,8 @@ line-length = 80
 
 [lint.per-file-ignores]
 "__init__.py" = ["F401"]
+"gendiff/formatters/stylish.py" = ["E501"]
+"gendiff/tree.py"               = ["E501"]
 
 [lint]
 preview = true

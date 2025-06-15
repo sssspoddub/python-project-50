@@ -16,6 +16,7 @@ gendiff = "gendiff.scripts.gendiff:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pytest-cov>=4", "ruff>=0.4"]
+yaml = ["PyYAML>=6"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["gendiff"]

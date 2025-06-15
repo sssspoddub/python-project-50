@@ -14,13 +14,13 @@ def _lowercase_bools(obj: Any) -> Any:
     if isinstance(obj, bool):
         return str(obj).lower()
     if isinstance(obj, list):
-        return [_lowercase_bools(x) for x in obj]
+        return [_lowercase_bools(v) for v in obj]
     if isinstance(obj, Mapping):
         return {k: _lowercase_bools(v) for k, v in obj.items()}
     return obj
 
 
-def parse(path: str | Path | Mapping) -> dict:
+def parse(path: str | Mapping) -> dict:
     if isinstance(path, Mapping):
         return dict(path)
 
@@ -30,7 +30,6 @@ def parse(path: str | Path | Mapping) -> dict:
     if ext in _JSON_EXT:
         data = json.load(p.open())
         return _lowercase_bools(data)
-
     if ext in _YAML_EXT:
         return yaml.safe_load(p.open())
 
