@@ -30,13 +30,13 @@ def generate_diff(
     for key in sorted(d1.keys() | d2.keys()):
         in1, in2 = key in d1, key in d2
 
-        if in1 and not in2:  # removed
+        if in1 and not in2:
             lines.append(f"  - {key}: {_stringify(d1[key])}")
-        elif not in1 and in2:  # added
+        elif not in1 and in2:
             lines.append(f"  + {key}: {_stringify(d2[key])}")
-        elif d1[key] == d2[key]:  # unchanged
+        elif d1[key] == d2[key]:
             lines.append(f"    {key}: {_stringify(d1[key])}")
-        else:  # changed
+        else:
             lines.append(f"  - {key}: {_stringify(d1[key])}")
             lines.append(f"  + {key}: {_stringify(d2[key])}")
 
