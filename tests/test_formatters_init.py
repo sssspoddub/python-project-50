@@ -1,4 +1,5 @@
 import pytest
+
 from gendiff.formatters import choose
 
 
