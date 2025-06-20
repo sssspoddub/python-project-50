@@ -1,8 +1,10 @@
 from pathlib import Path
-from typing import Mapping
 
-from gendiff.parsers import parse
+from .parsers import parse
 
 
-def read_file(path: str | Path | Mapping) -> dict:
-    return parse(path)
+def read_file(path: str):
+    p = Path(path)
+    if not p.exists():
+        raise FileNotFoundError(f"No such file: '{path}'")
+    return parse(str(p))
