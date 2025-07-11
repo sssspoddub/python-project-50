@@ -1,6 +1,10 @@
-__pycache__/
-*.py[cod]
-.pytest_cache/
-.ruff_cache/
-.venv/
-venv/
+*.egg-info
+__pycache__
+dist/
+*.pyc
+.venv
+.coverage
+coverage.xml
+*_cache/
+.python-version
+.vscode/

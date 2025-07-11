@@ -1,15 +1,28 @@
-.PHONY: lint test check test-coverage
+install:
+	uv sync
 
-lint:
-	uv run ruff check .
+run:
+	uv run gendiff
 
 test:
-	uv run pytest -q
+	uv run pytest
 
 test-coverage:
-	uv run pytest --cov=gendiff --cov-report=xml --cov-fail-under=80
+	uv run pytest --cov=gendiff --cov-report=xml:coverage.xml
 
-check: lint test
+lint:
+	uv run ruff check gendiff
 
-fix:
-	uv run ruff check --fix .
+check: test lint
+
+build:
+	uv build
+
+package-install:
+	uv tool install dist/*.whl
+
+reinstall:
+	uv tool install --force dist/*.whl
+
+uninstall:
+	uv tool uninstall hexlet-code

@@ -1,22 +1,26 @@
+[project]
+authors = [{ name = "spoddub", email = "spoddub98@gmail.com" }]
+name = "hexlet-code"
+version = "0.1.0"
+description = "CLI utility that compares two configuration files and shows a difference."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["pyyaml"]
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.7.1",
+    "pytest>=8.3.3",
+    "pytest-cov>=5.0.0",
+    "pyyaml>=6.0"
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[project]
-name = "hexlet-code"
-version = "0.1.0"
-description = "CLI utility that compares two configuration files and shows a difference."
-authors = [{ name = "Your Name", email = "you@example.com" }]
-readme = "README.md"
-requires-python = ">=3.9"
-dependencies = ["PyYAML>=6"]
-
 [project.scripts]
 gendiff = "gendiff.scripts.gendiff:main"
-
-[project.optional-dependencies]
-dev = ["pytest>=8", "pytest-cov>=4", "ruff>=0.4"]
-yaml = ["PyYAML>=6"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["gendiff"]

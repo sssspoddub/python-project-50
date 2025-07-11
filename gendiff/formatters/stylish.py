@@ -1,53 +1,73 @@
-from __future__ import annotations
+def format_stylish(diff_tree, depth=0):
+    indent = '    ' * depth
+    unchanged_indent = '    '
+    removed_indent = '  - '
+    added_indent = '  + '
 
-from typing import Any, Dict, List
+    lines = []
 
-from gendiff.nodes import ADDED, NESTED, REMOVED, UNCHANGED, UPDATED
+    for node in diff_tree:
+        key = node['key']
+        node_type = node['type']
 
-INDENT: int = 4
-SIGN_SHIFT: int = 2
+        if node_type == 'nested':
+            children_lines = format_stylish(node['children'], depth)
+            lines.append(f"{indent}{key}: {{")
+            if '\n' in children_lines:
+                indent_children = '\n'.join(
+                    f"{'    ' * depth}{line}"
+                    for line in children_lines.split('\n')
+                )
+                lines.append(indent_children)
+            else:
+                lines.append(f"{'    ' * (depth + 1)}{children_lines}")
+            lines.append(f"{indent}}}")
+
+        elif node_type == 'changed':
+            old_val = format_value(node['old_value'], depth + 1)
+            new_val = format_value(node['new_value'], depth + 1)
+            if old_val == new_val:
+                lines.append(f'{unchanged_indent}{key}: {old_val}')
+                lines.append(f"{unchanged_indent}{key}: {new_val}")
+            else:
+                lines.append(f"{removed_indent}{key}: {old_val}")
+                lines.append(f"{added_indent}{key}: {new_val}")
+
+        elif node_type == 'added':
+            val = format_value(node['value'], depth + 1)
+            lines.append(f"{added_indent}{key}: {val}")
+
+        elif node_type == 'removed':
+            val = format_value(node['value'], depth + 1)
+            lines.append(f"{removed_indent}{key}: {val}")
+
+        elif node_type == 'unchanged':
+            val = format_value(node['value'], depth + 1)
+            lines.append(f"{unchanged_indent}{key}: {val}")
+
+    return '\n'.join(lines)
 
 
-def _to_str(value: Any, depth: int) -> str:
-    if not isinstance(value, dict):
-        if isinstance(value, bool):
-            return str(value).lower()
-        if value is None:
-            return "null"
+def format_value(value, depth=0):
+    if isinstance(value, dict):
+        lines = []
+
+        for k, v in sorted(value.items()):
+            formatted_v = format_value(v, depth + 1)
+            lines.append(f"{'    ' * depth}{k}: {formatted_v}")
+
+        if not lines:
+            return '{}'
+
+        content = '\n'.join(lines)
+        indent = '    ' * (depth - 1)
+        return f"{{\n{content}\n{indent}}}"
+
+    elif isinstance(value, bool):
+        return 'true' if value else 'false'
+    elif value is None:
+        return 'null'
+    elif value == '':
+        return ''
+    else:
         return str(value)
-
-    indent: str = " " * (depth * INDENT)
-    lines: List[str] = [
-        f"{indent}{k}: {_to_str(v, depth + 1)}" for k, v in value.items()
-    ]
-    closing: str = " " * ((depth - 1) * INDENT)
-    return "{\n" + "\n".join(lines) + f"\n{closing}}}"
-
-
-def _format(tree: List[Dict[str, Any]], depth: int) -> str:
-    lines: List[str] = []
-    base_indent: str = " " * (depth * INDENT - SIGN_SHIFT)
-
-    for node in tree:
-        key: str = node["key"]
-        kind: str = node["type"]
-
-        if kind == ADDED:
-            lines.append(f"{base_indent}+ {key}: {_to_str(node['value'], depth + 1)}")
-        elif kind == REMOVED:
-            lines.append(f"{base_indent}- {key}: {_to_str(node['value'], depth + 1)}")
-        elif kind == UNCHANGED:
-            lines.append(f"{base_indent}  {key}: {_to_str(node['value'], depth + 1)}")
-        elif kind == UPDATED:
-            lines.append(f"{base_indent}- {key}: {_to_str(node['old'], depth + 1)}")
-            lines.append(f"{base_indent}+ {key}: {_to_str(node['new'], depth + 1)}")
-        elif kind == NESTED:
-            children_repr: str = _format(node["children"], depth + 1)
-            lines.append(f"{base_indent}  {key}: {children_repr}")
-
-    closing: str = " " * ((depth - 1) * INDENT)
-    return "{\n" + "\n".join(lines) + f"\n{closing}}}"
-
-
-def format_stylish(tree: List[Dict[str, Any]]) -> str:
-    return _format(tree, 1)
