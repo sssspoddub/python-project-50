@@ -14,3 +14,4 @@ gendiff/__pycache__/
 second_project.cast
 .DS_Store
 gendiff/__pycache__/
+.python-version
